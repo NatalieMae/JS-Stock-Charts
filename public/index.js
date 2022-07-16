@@ -35,17 +35,18 @@ async function runMain() {
     });
 
     new Chart(averagePriceChartCanvas.getContext('2d'), {
-        type: 'line',
+        type: 'pie',
         data: {
-            labels: stocks[0].values.map(value => value.datetime),
-            datasets: stocks.map( stock => ({
-            label: stock.meta.symbol,
-            data: stock.values.map(value => parseFloat(value.high)),
-            backgroundColor: getColor(stock.meta.symbol),
-            borderColor: getColor(stock.meta.symbol),
-            }))     
+            labels: stocks.map(stock => stock.meta.symbol),
+            datasets:  [{
+            label: "Average",
+            data: stocks.map(stock => getHighestPrice(stock.values)),
+            backgroundColor: stocks.map(stock => getColor(stock.meta.symbol)),
+            borderColor: stocks.map(stock => getColor(stock.meta.symbol)),
+            }]     
         }
     });
+
     function getColor(stock){
         if(stock === "GME"){
             return 'rgba(61, 161, 61, 0.7)'
@@ -77,6 +78,14 @@ async function runMain() {
         return [GME, MSFT, DIS, BNTX];
     }
 
+    function getAveragePrice(values){
+        let sum = 0;
+        for (let i=0; i<values.length; i++){
+            sum += parseFloat(values[i].high)
+        }
+        return sum.values.length;
+    }
+    
 const fetchStocks = async () => {
     const response = await fetch("https://api.twelvedata.com/stocks");
     const data = await response.json();
